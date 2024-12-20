@@ -1,0 +1,58 @@
+<div class="intro-x p-5">
+    <div>
+      <app-breadcrumbs
+        title="Summary of quality values of Trancom project"
+        [list]="['Project Managerment', 'Summary of quality values']"
+      ></app-breadcrumbs>
+      <form
+        CForm
+        [columns]="columnsForm"
+        [footer]="footer"
+        [isEnterSubmit]="true"
+        (onSubmit)="handleSubmit($event)"
+        [translatePage]="t"
+      >
+        <ng-template #footer let-canSubmit="canSubmit" let-form="form">
+          <div class="flex justify-between my-3">
+            <div class="flex flex-row gap-2">
+              <button
+                CButton
+                [className]="'px-5'"
+                [size]="EButtonSize.Large"
+                [text]="'Add'"
+                (click)="form.handleSubmit()"
+                [disabled]="!canSubmit()"
+              ></button>
+              <button
+                CButton
+                [size]="EButtonSize.Large"
+                [text]="'Export Excel'"
+                (click)="form.handleSubmit()"
+                [disabled]="!canSubmit()"
+              ></button>
+            </div>
+            <div class="flex flex-row gap-2">
+              <button CButton [size]="EButtonSize.Large" [text]="'Search'" (click)="handleSearch(form)"></button>
+              <button
+                CButton
+                [size]="EButtonSize.Large"
+                [text]="'Clear'"
+                (click)="handleClear(form)"
+                [disabled]="!canSubmit()"
+              ></button>
+            </div>
+          </div>
+        </ng-template>
+      </form>
+    </div>
+    <div
+      app-reusable-table
+      [tableData]="listOfSearch"
+      [tableColumns]="columnsSearch"
+      [parentHeaderBackground]="'#006241'"
+      [childHeaderBackground]="'#cce0d9'"
+      [scrollY]="'300px'"
+      (onCellClickEvent)="handleCellClick($event)"
+      [isLoading]="isLoading ?? false"
+    ></div>
+  </div>

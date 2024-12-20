@@ -1,0 +1,126 @@
+<ng-container
+  *ngTemplateOutlet="
+  component;
+  context: {
+    formItem: formItem(),
+    form: form(),
+    t: t(),
+    name: name(),
+    translatePage: translatePage(),
+    isChild: isChild(),
+    field: field(),
+    title: title(),
+  }
+"
+>
+</ng-container>
+<ng-template
+  #component
+  let-formItem="formItem"
+  let-form="form"
+  let-t="t"
+  let-name="name"
+  let-translatePage="translatePage"
+  let-isChild="isChild"
+  let-field="field"
+  let-title="title"
+>
+  <ng-container [ngSwitch]="formItem?.type">
+    <!-- CEMask -->
+    <div
+      *ngSwitchDefault
+      CEMask
+      [value]="field.api.state.value"
+      [mask]="formItem?.text?.mask"
+      [addonBefore]="formItem?.text?.addonBefore"
+      [addonAfter]="formItem?.text?.addonAfter"
+      [placeholder]="t.instant(formItem?.placeholder ?? 'Enter', { title: title?.toLowerCase() })"
+      (onBlur)="
+        formItem?.onBlur?.({ value: $any($event).target.value, form: form, name: field.name });
+        field.api.handleBlur()
+      "
+      (onChange)="
+        formItem?.onChange?.($any($event).target.value); field.api.handleChange($any($event).target.value)
+      "
+      [disabled]="!!formItem?.disabled?.({ value })"
+    ></div>
+
+    <!-- CEPassword -->
+    <div
+      *ngSwitchCase="EFormType.Password"
+      CEPassword
+      [value]="field.api.state.value"
+      [placeholder]="t.instant(formItem.placeholder ?? 'Enter', { title: title.toLowerCase() })"
+      (onBlur)="
+    formItem.onBlur?.({ value: $any($event).target.value, form: form(), name: field.name });
+    field.api.handleBlur()
+  "
+      (onChange)="
+    formItem.onChange?.($any($event).target.value); field.api.handleChange($any($event).target.value)
+  "
+      [disabled]="!!formItem.disabled?.({ value })"
+    ></div>
+
+    <!-- CESelect -->
+    <div
+      *ngSwitchCase="EFormType.Select"
+      CESelect
+      [maxTagCount]="3"
+      [value]="field.api?.state?.value"
+      [placeholder]="t.instant(formItem.placeholder ?? 'Enter', { title: title.toLowerCase() })"
+      (onBlur)="
+    formItem.onBlur?.({ value: $any($event).target.value, form: form(), name: field.name });
+    field.api.handleBlur()
+  "
+      (onChange)="
+    formItem.onChange?.($any($event)); field.api.handleChange($any($event))
+  "
+      [disabled]="!!formItem.disabled?.({ value })"
+      [get]="formItem.api"
+      [list]="formItem.list"
+      [isMultiple]="formItem.isMultiple"
+    ></div>
+
+    <!-- NZCheckbox -->
+    <nz-checkbox-wrapper
+      *ngSwitchCase="EFormType.Checkbox"
+      (nzOnChange)="formItem.onChange?.($any($event)); field.api.handleChange($any($event))"
+    >
+      @for (item of formItem.list; track item.value) {
+      <label
+        nz-checkbox
+        [nzValue]="item.value"
+        [ngModel]="!!field.api?.state?.value?.length && field.api?.state?.value.indexOf(item.value) > -1"
+        >{{item.label}}</label
+      >
+      }
+    </nz-checkbox-wrapper>
+
+    <ng-container *ngIf="!isChild">
+      <div
+        *ngSwitchCase="EFormType.Addable"
+        CEAddable
+        [form]="form"
+        [name]="name"
+        [column]="formItem?.column"
+        [textAdd]="formItem?.addable?.textAdd"
+        (onAdd)="formItem?.addable?.onAdd($event)"
+        [isTable]="formItem?.addable?.isTable"
+        [showRemove]="formItem?.addable?.showRemove"
+        [idCheck]="formItem?.addable?.isTable"
+        [value]="field?.api?.state?.value"
+        [field]="field"
+        [translatePage]="translatePage"
+        [t]="t"
+      ></div>
+    </ng-container>
+  </ng-container>
+
+  <div class="feedback">
+    @if (field.api.state.meta.isTouched && field.api.state.meta.errors.length > 0) { {{
+    field.api.state.meta.errors.join(',') }} } @else if (field.api.state.meta.isValidating) { {{ t.instant('Validating')
+    }} <nz-spin nzSimple nzSize="small" />
+    } {{ isError(field) ? '' : '|' }}
+  </div>
+  <svg *ngIf="isError(field)" CSvgIcon [name]="EIcon.Warning" className="svg-error"></svg>
+</ng-template>

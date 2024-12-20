@@ -1,0 +1,30 @@
+.parent-header {
+  @apply bg-green-500 p-2 text-center font-bold text-white;
+}
+
+/* Style for Child Headers */
+.child-header {
+  @apply bg-gray-100 p-2 text-center font-normal text-black;
+}
+
+.text-body {
+  @apply overflow-hidden;
+  .clickable {
+    @apply cursor-pointer bg-blue-50;
+  }
+}
+
+.cell-icon {
+  @apply ml-2 cursor-pointer align-middle text-blue-500;
+}
+
+.ellipsis-cell {
+  @apply overflow-hidden text-ellipsis whitespace-nowrap;
+}
+.buttonIcon {
+  @apply cursor-pointer;
+
+  &:hover {
+    @apply bg-gray-200 text-blue-600; /* Example styles for hover */
+  }
+}

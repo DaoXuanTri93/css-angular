@@ -1,0 +1,58 @@
+<nz-table
+  #reusableTable
+  [nzData]="tableData"
+  [nzBordered]="true"
+  [nzSize]="'small'"
+  [nzPaginationPosition]="'bottom'"
+  [nzShowPagination]="true"
+  [nzScroll]="{ x: null, y: scrollY }"
+  [nzWidthConfig]="columnWidths"
+  [nzLoading]="isLoading"
+  [nzNoResult]="isLoading ? 'Loading...' : 'No data'"
+>
+  <!-- Dynamic Table Header -->
+  <thead>
+    <tr *ngFor="let headerRow of headerRows">
+      <ng-container *ngFor="let col of headerRow">
+        <th
+          [ngClass]="{
+            'ellipsis-cell': reusableTable.data.length <= 0,
+            'parent-header': !col.children,
+            'child-header': col.children,
+          }"
+          [nz-tooltip]="reusableTable.data.length <= 0 ? col.title : null"
+          [nzLeft]="reusableTable.data.length > 0 && col.fixLeft ? col.leftPosition || '0px' : false"
+          [nzAlign]="'center'"
+          [style.background-color]="col.children ? childHeaderBackground : parentHeaderBackground"
+          [attr.rowspan]="col.rowspan || 1"
+          [attr.colspan]="col.colspan || 1"
+        >
+          {{ col.title }}
+        </th>
+      </ng-container>
+    </tr>
+  </thead>
+
+  <!-- Dynamic Table Body -->
+  <tbody>
+    <tr *ngFor="let data of reusableTable.data">
+      <ng-container *ngFor="let col of flattenedColumns">
+        <td
+          [ngClass]="{ buttonIcon: col.clickable }"
+          [nzEllipsis]="true"
+          [nzAlign]="'center'"
+          class="text-body"
+          *ngIf="col.key"
+          [nzLeft]="col.fixLeft ? col.leftPosition || '0px' : false"
+          (click)="col.clickable ? onCellClick(data, col.key) : null"
+          [nz-tooltip]="data[col.key]"
+        >
+          {{ getNestedValue(data, col.key) }}
+          <span class="flex justify-center">
+            <svg *ngIf="col.icon" CSvgIcon [name]="col.icon" [size]="20"></svg>
+          </span>
+        </td>
+      </ng-container>
+    </tr>
+  </tbody>
+</nz-table>

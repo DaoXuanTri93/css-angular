@@ -1,0 +1,75 @@
+<ng-container [ngTemplateOutlet]="firstItem() ?? null"></ng-container>
+<table class="c-virtual-scroll" [ngClass]="{ virtualized: this.isVirtualized() }" [ngStyle]="columnSizeVars()">
+  <thead>
+    @for (headerGroup of table.getHeaderGroups(); let index = $index; track headerGroup.id) {
+    <tr>
+      <th
+        *ngIf="isVirtualized() && index === table.getHeaderGroups().length - 1 && refVirtualPaddingLeft"
+        [style.width.px]="refVirtualPaddingLeft"
+      ></th>
+      @for ( header of generateArray(isVirtualized() && index === table.getHeaderGroups().length - 1 ? virtualColumns :
+      headerGroup.headers); track header.id ) {
+      <th
+        [ngStyle]="getCommonPinningStyles(header?.column, header?.id)"
+        [ngClass]="{
+          'has-sorter': header?.column?.getCanSort(),
+          'has-filter': header?.column?.getCanFilter(),
+        }"
+        [ariaLabel]="header?.column?.columnDef.header?.toString()"
+      >
+        <button
+          type="button"
+          class="flex w-full items-center justify-between"
+          [ngClass]="{
+            'cursor-default': !header?.column?.columnDef?.meta?.sorter || !header?.column?.getCanSort(),
+            hidden: header?.column?.columnDef?.meta?.isHeaderHide,
+            '!text-center': header?.id === 'rowSelection',
+          }"
+          (click)="header?.column?.columnDef?.meta?.sorter && header?.column?.getToggleSortingHandler()"
+        >
+          <ng-container *flexRender="header.column.columnDef.header; props: header.getContext(); let headerText">
+            {{ headerText }}
+          </ng-container>
+          <svg
+            *ngIf="header?.column?.getIsSorted()"
+            CSvgIcon
+            [name]="EIcon.Sort"
+            [size]="10"
+            class="sort"
+            [ngClass]="{'rotate-180': header?.column?.getIsSorted() === 'asc'}"
+          ></svg>
+        </button>
+        <div Filter [column]="header.column" [refFilterTypeCurrent]="refFilterTypeCurrent"></div>
+        <button
+          type="button"
+          class="resizer"
+          [ngClass]="{ resizing: header?.column?.getIsResizing() }"
+          (dblclick)="header?.column?.resetSize()"
+          (mousedown)="header?.getResizeHandler($event)()"
+          (touchstart)="header?.getResizeHandler($event)()"
+        ></button>
+      </th>
+      }
+    </tr>
+    }
+  </thead>
+</table>
+<nz-dropdown-menu #renderDropdownItem="nzDropdownMenu">
+  <ul nz-menu>
+    <li nz-menu-item>
+      <button>{{ t.instant('Hide') }}</button>
+    </li>
+    <li nz-menu-item>
+      <button>{{ t.instant('PinLeft') }}</button>
+    </li>
+    <li nz-menu-item>
+      <button>{{ t.instant('PinRight') }}</button>
+    </li>
+    <li nz-menu-item>
+      <button>{{ t.instant('ResetSize') }}</button>
+    </li>
+    <li nz-menu-item>
+      <button>{{ t.instant('ResetPin') }}</button>
+    </li>
+  </ul>
+</nz-dropdown-menu>
